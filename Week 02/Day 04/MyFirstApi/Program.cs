@@ -1,6 +1,8 @@
 
 using Microsoft.AspNetCore.Mvc;
+using MyFirstApi.Middleware;
 using MyFirstApi.Models;
+using MyFirstApi.Services;
 using System.Reflection;
 namespace MyFirstApi
 {
@@ -9,7 +11,7 @@ namespace MyFirstApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             builder.Services.AddControllers();
           
@@ -57,6 +59,7 @@ namespace MyFirstApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseMiddleware<RequestLoggingMiddleware>();
             try
             {
                 app.MapControllers();
