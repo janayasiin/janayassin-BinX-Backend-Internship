@@ -43,7 +43,6 @@ Library Catalog
 | PUT /api/v1/books/{id} | 200 OK | 404 Not Found - Book does not exist |
 | DELETE /api/v1/books/{id} | 204 No Content | 404 Not Found - Book does not exist |
 
-
 ## 5. API Versioning
 
 The API will use URL versioning.
