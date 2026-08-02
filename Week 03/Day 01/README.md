@@ -37,7 +37,7 @@ Library Catalog
 
 | Endpoint | Success Status Code | Error Status Code |
 |----------|---------------------|-------------------|
-| GET /api/v1/books | 200 OK | 401 Unauthorized - User authentication required |
+| GET /api/v1/books | 200 OK | 500 Internal Server Error - Unexpected server failure |
 | GET /api/v1/books/{id} | 200 OK | 404 Not Found - Book does not exist |
 | POST /api/v1/books | 201 Created | 400 Bad Request - Invalid book data |
 | PUT /api/v1/books/{id} | 200 OK | 404 Not Found - Book does not exist |
@@ -48,13 +48,20 @@ Library Catalog
 
 The API will use URL versioning.
 
+
 Examples:
 
-- Version 1:
-/api/v1/books
+- Version 1: /api/v1/books
 
-- Future Version:
- /api/v2/books
+- Future Version: /api/v2/books
 
+- 
 Using version numbers in the URL allows future changes to be introduced without breaking existing clients.
 
+
+## 6. REST Principles Applied
+
+- Resources are represented using plural nouns such as `/books` and `/authors`.
+- HTTP methods define actions on resources instead of using verbs in URLs.
+- Each request contains all required information, following the stateless REST principle.
+- API versioning is used to support future changes without breaking existing clients.
