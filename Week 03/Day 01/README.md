@@ -56,6 +56,9 @@ Examples:
 
 Using version numbers in the URL allows future changes to be introduced without breaking existing clients.
 
+
+## 6. REST Principles Applied
+
 - Resources are represented using plural nouns such as `/books` and `/authors`.
 - HTTP methods define actions on resources instead of using verbs in URLs.
 - Each request contains all required information, following the stateless REST principle.
