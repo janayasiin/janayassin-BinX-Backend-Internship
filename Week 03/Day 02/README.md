@@ -18,6 +18,7 @@
 |--------|------|-------------|
 | Id | INT | Primary Key |
 | Name | VARCHAR(100) | Category name |
+| Description | VARCHAR(300) | Category description |
 
 
 ## Books
@@ -60,11 +61,11 @@
 
 ## First Normal Form (1NF)
 
-The design follows 1NF by ensuring that every column contains atomic values and each attribute stores a single value only.
+The design follows 1NF by ensuring that all attributes contain atomic values and each column stores a single value only.
 
 Examples:
-- Book information is stored in separate columns instead of storing multiple values in one field.
-- Authors and categories are stored separately instead of using repeated data inside the Books table.
+- Book information is stored in separate columns instead of combining multiple values in one field.
+- Authors and categories are stored in separate tables instead of repeating data inside the Books table.
 
 This prevents multi-valued attributes and reduces data duplication.
 
@@ -124,23 +125,13 @@ This prevents update anomalies and unnecessary data repetition.
 
 The database relationships are:
 
-- One Author can have many Books.
-- One Category can contain many Books.
-- One Member can have many Loans.
-- One Book can have many Loan records over time.
+- Authors (1) → (Many) Books
+- Categories (1) → (Many) Books
+- Members (1) → (Many) Loans
+- Books (1) → (Many) Loans
 
 
-Relationship Summary:
-
-```
-Authors (1) -------- (*) Books
-
-Categories (1) ----- (*) Books
-
-Members (1) -------- (*) Loans
-
-Books (1) ----------- (*) Loans
-```
+These relationships ensure data consistency and represent the real-world ownership between entities.
 
 
 ---
