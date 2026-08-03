@@ -161,4 +161,4 @@ The ERD shows:
 - Relationships
 
 
-![Library Catalog ERD](images/library-erd.png.png)
+![Library Catalog ERD](images/library-erd.png)
