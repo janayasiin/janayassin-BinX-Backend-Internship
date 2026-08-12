@@ -65,11 +65,19 @@ public class MedicationsController : ControllerBase
         );
     }
 
-    // Get all medications.
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+// Get all medications or filter them by patient ID.
+[HttpGet]
+public async Task<IActionResult> GetAll(int? patientId)
     {
-        var medications = await _context.Medications
+        var query = _context.Medications.AsQueryable();
+
+        // Apply the patient filter only when a patient ID is provided.
+        if (patientId.HasValue)
+        {
+            query = query.Where(m => m.PatientId == patientId.Value);
+        }
+
+        var medications = await query
             .Select(m => new MedicationResponse
             {
                 Id = m.Id,
@@ -84,6 +92,7 @@ public class MedicationsController : ControllerBase
 
         return Ok(medications);
     }
+
 
     // Get a specific medication by its ID.
     [HttpGet("{id}")]

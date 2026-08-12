@@ -61,11 +61,28 @@ public class AppointmentsController : ControllerBase
         );
     }
 
-    // Get all appointments.
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+   
+// Get all appointments with optional patient and status filters.
+[HttpGet]
+public async Task<IActionResult> GetAll(
+    int? patientId,
+    string? status)
     {
-        var appointments = await _context.Appointments
+        var query = _context.Appointments.AsQueryable();
+
+        // Filter appointments by patient when a patient ID is provided.
+        if (patientId.HasValue)
+        {
+            query = query.Where(a => a.PatientId == patientId.Value);
+        }
+
+        // Filter appointments by status when a status is provided.
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(a => a.Status == status);
+        }
+
+        var appointments = await query
             .Select(a => new AppointmentResponse
             {
                 Id = a.Id,
@@ -78,6 +95,8 @@ public class AppointmentsController : ControllerBase
 
         return Ok(appointments);
     }
+
+
 
     // Get a specific appointment by its ID.
     [HttpGet("{id}")]
