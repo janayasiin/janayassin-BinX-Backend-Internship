@@ -1,40 +1,24 @@
 # Week 04 - Day 04
 
-## Library Catalog API
+## Input Validation with FluentValidation
 
 ### Topics Covered
-- FluentValidation
-- JWT Authentication
-- Claims-based Authorization
-- Custom Middleware
-- API Testing with Swagger & Postman
+- DataAnnotations vs. FluentValidation
+- Writing FluentValidation validators
+- Integrating validation into the ASP.NET Core pipeline
+- Structured validation errors
 
-### Validation
-Implemented FluentValidation for:
-- CreateBookRequest
-- UpdateBookRequest
-
-Validation includes:
-- Required Title and ISBN
-- Maximum length
-- Price greater than 0
-- Valid AuthorId
-- Valid CategoryId
-
-### Authentication & Authorization
-- Configured ASP.NET Core Identity
-- Added JWT Bearer Authentication
-- Added `CanManageBooks` authorization policy
-- Used `Permission = ManageBooks` claim
-
-### Middleware
-Added `RequestLoggingMiddleware` to log HTTP requests.
+### Implementation
+- Installed FluentValidation and ASP.NET Core integration.
+- Created validators for:
+  - `CreateBookRequest`
+  - `UpdateBookRequest`
+- Added business validation rules for Title, ISBN, Price, AuthorId, and CategoryId.
+- Registered validators to run automatically during request validation.
 
 ### Testing
-Tested the API using Swagger and Postman, including:
-- Valid requests
-- Invalid requests
-- Validation errors
-- Authentication
-- Authorization
-- Book creation and update
+Tested each validation rule individually using Postman and verified that invalid requests return structured `400 Bad Request` responses with meaningful field-specific error messages.
+
+### Tools
+- FluentValidation
+- Postman
