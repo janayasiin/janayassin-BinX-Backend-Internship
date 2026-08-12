@@ -3,6 +3,7 @@ using CardiacPatientMonitoringSystem.DTOs;
 using CardiacPatientMonitoringSystem.DTOs.Requests;
 using CardiacPatientMonitoringSystem.DTOs.Responses;
 using CardiacPatientMonitoringSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace CardiacPatientMonitoringSystem.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PatientsController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -147,5 +149,12 @@ public class PatientsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+
+
+    }
+    [HttpGet("test-error")]
+    public IActionResult TestError()
+    {
+        throw new Exception("Test exception");
     }
 }
