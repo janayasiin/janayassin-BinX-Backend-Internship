@@ -49,56 +49,55 @@ public class AuthController : ControllerBase
         });
 
     }
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            return Unauthorized();
+        }
 
-            if (user == null)
-            {
-                return Unauthorized();
-            }
+        var result = await _signInManager.CheckPasswordSignInAsync(
+            user,
+            request.Password,
+            false
+        );
 
-            var result = await _signInManager.CheckPasswordSignInAsync(
-                user,
-                request.Password,
-                false
-            );
+        if (!result.Succeeded)
+        {
+            return Unauthorized();
+        }
 
-            if (!result.Succeeded)
-            {
-                return Unauthorized();
-            }
         var claims = new[]
-{
-    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-    new Claim(ClaimTypes.Email, user.Email!)
+        {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(ClaimTypes.Email, user.Email!)
+    };
 
-};
         var key = new SymmetricSecurityKey(
-    Encoding.UTF8.GetBytes(
-        _configuration["Jwt:Key"]!
-    )
-);
+            Encoding.UTF8.GetBytes(
+                _configuration["Jwt:Key"]!
+            )
+        );
 
         var credentials = new SigningCredentials(
-    key,
-    SecurityAlgorithms.HmacSha256
-);
+            key,
+            SecurityAlgorithms.HmacSha256
+        );
+
         var token = new JwtSecurityToken(
-    issuer: _configuration["Jwt:Issuer"],
-    audience: _configuration["Jwt:Audience"],
-    claims: claims,
-    expires: DateTime.UtcNow.AddMinutes(15),
-    signingCredentials: credentials
-);
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(15),
+            signingCredentials: credentials
+        );
+
         return Ok(new
         {
             token = new JwtSecurityTokenHandler().WriteToken(token)
         });
-        return Ok(new
-            {
-                message = "Login successful."
-            });
-        }
     }
+}

@@ -152,9 +152,5 @@ public class PatientsController : ControllerBase
 
 
     }
-    [HttpGet("test-error")]
-    public IActionResult TestError()
-    {
-        throw new Exception("Test exception");
-    }
+   
 }
