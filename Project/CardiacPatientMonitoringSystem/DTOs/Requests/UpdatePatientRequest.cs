@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using CardiacPatientMonitoringSystem.Models;
 
-namespace CardiacPatientMonitoringSystem.DTOs.Requests;
+namespace CardiacPatientMonitoringSystem.DTOs;
 
 public class UpdatePatientRequest
 {

@@ -1,4 +1,5 @@
 ﻿using CardiacPatientMonitoringSystem.Data;
+using CardiacPatientMonitoringSystem.DTOs;
 using CardiacPatientMonitoringSystem.DTOs.Requests;
 using CardiacPatientMonitoringSystem.DTOs.Responses;
 using CardiacPatientMonitoringSystem.Models;
