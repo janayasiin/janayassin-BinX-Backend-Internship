@@ -1,43 +1,40 @@
-# Day 04 — Input Validation with FluentValidation
+# Week 04 - Day 04
 
-## Overview
+## Library Catalog API
 
-This day focused on implementing input validation in ASP.NET Core using **FluentValidation**.
+### Topics Covered
+- FluentValidation
+- JWT Authentication
+- Claims-based Authorization
+- Custom Middleware
+- API Testing with Swagger & Postman
 
-The goal was to move validation rules out of the DTOs and define them in separate validator classes, including business rules that go beyond simple required-field checks.
+### Validation
+Implemented FluentValidation for:
+- CreateBookRequest
+- UpdateBookRequest
 
----
+Validation includes:
+- Required Title and ISBN
+- Maximum length
+- Price greater than 0
+- Valid AuthorId
+- Valid CategoryId
 
-## Learning Objectives
+### Authentication & Authorization
+- Configured ASP.NET Core Identity
+- Added JWT Bearer Authentication
+- Added `CanManageBooks` authorization policy
+- Used `Permission = ManageBooks` claim
 
-- Understand the difference between DataAnnotations and FluentValidation.
-- Create validators using `AbstractValidator<T>`.
-- Define meaningful validation and business rules.
-- Integrate FluentValidation into the ASP.NET Core request pipeline.
-- Return structured validation errors.
-- Test validation behavior using Postman.
+### Middleware
+Added `RequestLoggingMiddleware` to log HTTP requests.
 
----
-
-## DataAnnotations vs FluentValidation
-
-Initially, the request DTOs used DataAnnotations such as:
-
-- `[Required]`
-- `[StringLength]`
-- `[Range]`
-
-For this exercise, these validation attributes were removed from the DTOs and the validation logic was moved into dedicated FluentValidation classes.
-
-This keeps the DTOs focused on representing request data while validation rules are maintained separately.
-
----
-
-## Validators
-
-Two validators were implemented:
-
-```text
-Validators/
-├── CreateBookRequestValidator.cs
-└── UpdateBookRequestValidator.cs
+### Testing
+Tested the API using Swagger and Postman, including:
+- Valid requests
+- Invalid requests
+- Validation errors
+- Authentication
+- Authorization
+- Book creation and update
