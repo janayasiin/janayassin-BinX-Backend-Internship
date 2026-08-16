@@ -43,19 +43,3 @@ The API also provides medication and appointment management, with validation, au
 - Swagger / OpenAPI
 - Postman
 
-## Project Structure
-
-```text
-CardiacPatientMonitoringSystem/
-├── Controllers/
-├── Models/
-├── DTOs/
-├── Data/
-├── Validators/
-├── Middleware/
-├── Migrations/
-└── Program.cs
-
-CardiacPatientMonitoringSystem.Tests/
-├── AuthControllerTests.cs
-└── PatientsControllerTests.cs
