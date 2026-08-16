@@ -1,14 +1,12 @@
-# Project Scope
+## Day 1 — Phase 3 Project Selection & Unit Testing
 
+### Completed Work
 
-
-# The Cardiac Patient Monitoring System is an ASP.NET Core REST API for managing patients, vital signs, medications, and appointments.
-
-
-
-# It provides JWT-based authentication, input validation, centralized error handling, EF Core with SQL Server, and documented API endpoints through Swagger and Postman.
-
-
-
-# The project also includes automated tests using xUnit and Moq to verify important API behavior.
-
+* Selected **Cardiac Patient Monitoring System** as the Phase 3 project.
+* Defined the project scope and confirmed the main backend modules and technical requirements.
+* Created a separate **xUnit test project** and referenced the main API project.
+* Created `VitalSignService` as a simple service for testing.
+* Applied the **Arrange-Act-Assert (AAA)** pattern in unit tests.
+* Added 3 `[Fact]` tests covering normal, low, and boundary heart-rate values.
+* Added a `[Theory]` test with multiple input cases using `[InlineData]`.
+* Ran all automated tests successfully: **6 passed, 0 failed**.
