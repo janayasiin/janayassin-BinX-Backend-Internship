@@ -9,16 +9,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace CardiacPatientMonitoringSystem;
 
 public class Program
 {
-   
-        public static async Task Main(string[] args)
-        {
-            
+    public static void Main(string[] args)
+    {
         var builder = WebApplication.CreateBuilder(args);
 
         // Controllers
@@ -29,39 +26,22 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<CreatePatientRequestValidator>();
 
         // Swagger
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header,
-                Description = "Enter your JWT token"
-            });
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-        });
-
-        // Database
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")
-            ));
+        {
+            if (builder.Environment.IsEnvironment("Testing"))
+            {
+                options.UseInMemoryDatabase("CardiacPatientMonitoringTestDb");
+            }
+            else
+            {
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                );
+            }
+        });
 
         // ASP.NET Core Identity
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -100,26 +80,12 @@ public class Program
 
         // Authorization
         builder.Services.AddAuthorization();
+
         var app = builder.Build();
-
-        using (var scope = app.Services.CreateScope())
-        {
-            var roleManager = scope.ServiceProvider
-                .GetRequiredService<RoleManager<IdentityRole>>();
-
-            var userManager = scope.ServiceProvider
-                .GetRequiredService<UserManager<ApplicationUser>>();
-
-            await RoleSeedData.InitializeAsync(roleManager);
-
-            var context = scope.ServiceProvider
-                .GetRequiredService<AppDbContext>();
-
-            await SeedData.InitializeAsync(context, userManager);
-        }
 
         // Centralized exception handling
         app.UseMiddleware<ExceptionHandlingMiddleware>();
+
         // Swagger
         app.UseSwagger();
         app.UseSwaggerUI();

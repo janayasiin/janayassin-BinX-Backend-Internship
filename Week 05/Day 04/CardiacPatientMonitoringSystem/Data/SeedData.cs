@@ -1,53 +1,21 @@
 ﻿using CardiacPatientMonitoringSystem.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CardiacPatientMonitoringSystem.Data;
 
 public static class SeedData
 {
-    public static async Task InitializeAsync(
-        AppDbContext context,
-        UserManager<ApplicationUser> userManager)
+    public static async Task InitializeAsync(AppDbContext context)
     {
         if (await context.Patients.AnyAsync())
         {
             return;
         }
 
-        // Create users for the seeded patients
-        var ahmadUser = new ApplicationUser
-        {
-            UserName = "ahmad@example.com",
-            Email = "ahmad@example.com"
-        };
-
-        var saraUser = new ApplicationUser
-        {
-            UserName = "sara@example.com",
-            Email = "sara@example.com"
-        };
-
-        var omarUser = new ApplicationUser
-        {
-            UserName = "omar@example.com",
-            Email = "omar@example.com"
-        };
-
-        await userManager.CreateAsync(ahmadUser, "Test123!");
-        await userManager.CreateAsync(saraUser, "Test123!");
-        await userManager.CreateAsync(omarUser, "Test123!");
-
-        // Assign Patient role to each user
-        await userManager.AddToRoleAsync(ahmadUser, "Patient");
-        await userManager.AddToRoleAsync(saraUser, "Patient");
-        await userManager.AddToRoleAsync(omarUser, "Patient");
-
         var patients = new List<Patient>
         {
             new Patient
             {
-                UserId = ahmadUser.Id,
                 FullName = "Ahmad Ali",
                 DateOfBirth = new DateTime(1985, 5, 12),
                 Gender = Gender.Male,
@@ -55,10 +23,8 @@ public static class SeedData
                 Email = "ahmad@example.com",
                 MedicalHistory = "Hypertension"
             },
-
             new Patient
             {
-                UserId = saraUser.Id,
                 FullName = "Sara Hassan",
                 DateOfBirth = new DateTime(1990, 8, 20),
                 Gender = Gender.Female,
@@ -66,10 +32,8 @@ public static class SeedData
                 Email = "sara@example.com",
                 MedicalHistory = "Previous cardiac follow-up"
             },
-
             new Patient
             {
-                UserId = omarUser.Id,
                 FullName = "Omar Khaled",
                 DateOfBirth = new DateTime(1978, 2, 3),
                 Gender = Gender.Male,
@@ -94,7 +58,6 @@ public static class SeedData
                 OxygenSaturation = 98,
                 RecordedAt = DateTime.UtcNow
             },
-
             new VitalSign
             {
                 PatientId = patients[1].Id,
@@ -105,7 +68,6 @@ public static class SeedData
                 OxygenSaturation = 97,
                 RecordedAt = DateTime.UtcNow
             },
-
             new VitalSign
             {
                 PatientId = patients[2].Id,
@@ -130,7 +92,6 @@ public static class SeedData
                 Frequency = "Once daily",
                 StartDate = new DateTime(2026, 8, 1)
             },
-
             new Medication
             {
                 PatientId = patients[1].Id,
@@ -139,7 +100,6 @@ public static class SeedData
                 Frequency = "Once daily",
                 StartDate = new DateTime(2026, 8, 1)
             },
-
             new Medication
             {
                 PatientId = patients[2].Id,
@@ -161,7 +121,6 @@ public static class SeedData
                 Reason = "Cardiac follow-up",
                 Status = "Scheduled"
             },
-
             new Appointment
             {
                 PatientId = patients[1].Id,
@@ -169,7 +128,6 @@ public static class SeedData
                 Reason = "Routine check-up",
                 Status = "Scheduled"
             },
-
             new Appointment
             {
                 PatientId = patients[2].Id,

@@ -1,12 +1,10 @@
 ﻿using CardiacPatientMonitoringSystem.Models;
 
-namespace CardiacPatientMonitoringSystem.DTOs.Auth;
+namespace CardiacPatientMonitoringSystem.DTOs.Responses;
 
-public class RegisterRequest
+public class PatientResponse
 {
-    public string Email { get; set; } = string.Empty;
-
-    public string Password { get; set; } = string.Empty;
+    public int Id { get; set; }
 
     public string FullName { get; set; } = string.Empty;
 
@@ -15,6 +13,8 @@ public class RegisterRequest
     public Gender Gender { get; set; }
 
     public string PhoneNumber { get; set; } = string.Empty;
+
+    public string Email { get; set; } = string.Empty;
 
     public string MedicalHistory { get; set; } = string.Empty;
 }

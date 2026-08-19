@@ -4,6 +4,7 @@ using CardiacPatientMonitoringSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CardiacPatientMonitoringSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260812160910_AddIdentity")]
+    partial class AddIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,14 +185,7 @@ namespace CardiacPatientMonitoringSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Patients");
                 });
@@ -385,17 +381,6 @@ namespace CardiacPatientMonitoringSystem.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("CardiacPatientMonitoringSystem.Models.Patient", b =>
-                {
-                    b.HasOne("CardiacPatientMonitoringSystem.Models.ApplicationUser", "User")
-                        .WithOne("Patient")
-                        .HasForeignKey("CardiacPatientMonitoringSystem.Models.Patient", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("CardiacPatientMonitoringSystem.Models.VitalSign", b =>
                 {
                     b.HasOne("CardiacPatientMonitoringSystem.Models.Patient", "Patient")
@@ -456,11 +441,6 @@ namespace CardiacPatientMonitoringSystem.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CardiacPatientMonitoringSystem.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("CardiacPatientMonitoringSystem.Models.Patient", b =>

@@ -2,16 +2,16 @@
 using CardiacPatientMonitoringSystem.DTOs;
 using CardiacPatientMonitoringSystem.DTOs.Requests;
 using CardiacPatientMonitoringSystem.DTOs.Responses;
+using CardiacPatientMonitoringSystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace CardiacPatientMonitoringSystem.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Patient")]
+[Authorize]
 public class PatientsController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -21,14 +21,44 @@ public class PatientsController : ControllerBase
         _context = context;
     }
 
-    // Get the currently authenticated patient's profile.
-    [HttpGet("me")]
-    public async Task<IActionResult> GetMyProfile()
+    [HttpPost]
+    public async Task<IActionResult> Create(CreatePatientRequest request)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var patient = new Patient
+        {
+            FullName = request.FullName,
+            DateOfBirth = request.DateOfBirth,
+            Gender = request.Gender,
+            PhoneNumber = request.PhoneNumber,
+            Email = request.Email,
+            MedicalHistory = request.MedicalHistory
+        };
 
-        var patient = await _context.Patients
-            .Where(p => p.UserId == userId)
+        await _context.Patients.AddAsync(patient);
+        await _context.SaveChangesAsync();
+
+        var response = new PatientResponse
+        {
+            Id = patient.Id,
+            FullName = patient.FullName,
+            DateOfBirth = patient.DateOfBirth,
+            Gender = patient.Gender,
+            PhoneNumber = patient.PhoneNumber,
+            Email = patient.Email,
+            MedicalHistory = patient.MedicalHistory
+        };
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = patient.Id },
+            response
+        );
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var patients = await _context.Patients
             .Select(p => new PatientResponse
             {
                 Id = p.Id,
@@ -39,24 +69,16 @@ public class PatientsController : ControllerBase
                 Email = p.Email,
                 MedicalHistory = p.MedicalHistory
             })
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
-        if (patient == null)
-        {
-            return NotFound("Patient profile not found.");
-        }
-
-        return Ok(patient);
+        return Ok(patients);
     }
 
-    // Get a specific patient only if the patient belongs to the authenticated user.
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         var patient = await _context.Patients
-            .Where(p => p.Id == id && p.UserId == userId)
+            .Where(p => p.Id == id)
             .Select(p => new PatientResponse
             {
                 Id = p.Id,
@@ -77,17 +99,13 @@ public class PatientsController : ControllerBase
         return Ok(patient);
     }
 
-    // Update only the authenticated patient's profile.
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         int id,
         UpdatePatientRequest request)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         var patient = await _context.Patients
-            .FirstOrDefaultAsync(
-                p => p.Id == id && p.UserId == userId);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (patient == null)
         {
@@ -115,15 +133,11 @@ public class PatientsController : ControllerBase
         });
     }
 
-    // Delete only the authenticated patient's profile.
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         var patient = await _context.Patients
-            .FirstOrDefaultAsync(
-                p => p.Id == id && p.UserId == userId);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (patient == null)
         {
@@ -135,5 +149,9 @@ public class PatientsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+
+
     }
+   
+
 }
