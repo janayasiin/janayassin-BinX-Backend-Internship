@@ -1,4 +1,3 @@
-# BINX TECH — Backend Development Internship (.NET)
 
 ## Week 5 — Testing, Error Handling & Project Kickoff
 
