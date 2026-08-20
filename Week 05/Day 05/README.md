@@ -1,40 +1,23 @@
-# Day 5 — Testing & Week 5 Synthesis
+# Day 5 — Applying Testing to the Project
 
 ## Overview
 
-Applied testing practices to the selected Phase 3 project, focusing on high-risk business logic, integration testing, centralized error handling, and full test-suite execution.
+Applied unit and integration testing to the Cardiac Patient Monitoring System, focusing on high-risk logic and important API behavior.
 
-## What Was Completed
+## Testing Implemented
 
-- Identified the highest-risk areas of the project that require testing priority.
-- Implemented unit tests for critical business logic using **xUnit** and **Moq**.
-- Added integration tests for important API endpoints.
-- Implemented and verified centralized error handling.
-- Ran the complete test suite using `dotnet test`.
-- Verified that the implemented tests pass successfully.
-- Prepared the project foundation for **Phase 3 Sprint 1**.
+- Unit tests for `VitalSignService`.
+- Unit tests for `VitalSignAnalysisService` using Moq.
+- Validation tests for `CreateAppointmentRequestValidator`.
+- Integration tests for the `Appointments` API.
+- In-Memory Database configuration for integration testing.
 
-## Testing Strategy
+## Integration Test Scenarios
 
-Testing was prioritized based on **risk and complexity**, with emphasis on:
+- Existing patient → `201 Created`
+- Non-existing patient → `404 Not Found`
 
-- Business logic containing branching and validation.
-- Authentication and authorization.
-- Operations involving important data or transactions.
-- Previously identified bug-prone functionality.
-
-Simple pass-through code and trivial properties were not prioritized for extensive testing.
-
-## Tools Used
-
-- **xUnit** — Unit and integration testing
-- **Moq** — Mocking dependencies
-- **ASP.NET Core** — API development and testing
-- **Notion** — Week 5 documentation and synthesis
-
-## Full Test Suite
-
-The complete test suite was executed using:
+## Test Results
 
 ```bash
 dotnet test
