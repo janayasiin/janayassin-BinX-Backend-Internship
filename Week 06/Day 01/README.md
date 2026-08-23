@@ -1,94 +1,230 @@
-# \# EventHub — Week 6 Day 1
+# EventHub — Day 1: Sprint 1 Planning & Database Design
 
-# 
+## Project Overview
 
-# \## Sprint 1 — Planning \& Database Design
+EventHub is an ASP.NET Core Web API for managing events, ticket types, and user bookings.
 
-# 
+The project will be developed incrementally throughout Phase 3, starting with the database foundation and core routes in Sprint 1, then adding authentication, authorization, performance improvements, testing, documentation, and deployment in later sprints.
 
-# \### Sprint Goal
+---
 
-# 
+## Sprint 1 Goal
 
-# Build the database foundation and core event and ticket booking functionality for EventHub.
+Build the foundation of the EventHub API by designing and documenting the complete database schema and preparing the core event, ticket, and booking flows.
 
-# 
+---
 
-# \### Project Scope
+## Day 1 Objectives
 
-# 
+The main objectives for Day 1 are:
 
-# EventHub is an ASP.NET Core Web API for managing events, venues, tickets, and user bookings.
+* Run Sprint 1 Planning.
+* Define the Sprint 1 goal.
+* Design the complete database schema.
+* Identify the main entities and their relationships.
+* Create and document the ERD.
+* Break the Sprint 1 scope into realistic backlog tasks.
 
-# 
+---
 
-# \### Database Entities
+## Database Entities
 
-# 
+The EventHub database is based on the following entities:
 
-# \- Event
+### Users
 
-# \- Category
+Represents users who can make bookings.
 
-# \- Venue
+* Id
+* Name
+* Email
+* CreatedAt
 
-# \- Ticket
+### Categories
 
-# \- Booking
+Represents categories used to organize events.
 
-# \- BookingItem
+* Id
+* Name
+* Description
 
-# \- IdentityUser
+### Events
 
-# 
+Represents events available on the platform.
 
-# \### Main Relationships
+* Id
+* Title
+* Description
+* Location
+* StartDate
+* EndDate
+* Capacity
+* CategoryId
+* CreatedAt
 
-# 
+### TicketTypes
 
-# \- Category → Events (1:N)
+Represents the different ticket types available for an event.
 
-# \- Venue → Events (1:N)
+* Id
+* EventId
+* Name
+* Price
+* QuantityAvailable
 
-# \- Event → Tickets (1:N)
+### Bookings
 
-# \- User → Bookings (1:N)
+Represents a user's booking.
 
-# \- Booking → BookingItems (1:N)
+* Id
+* UserId
+* BookingDate
+* Status
+* TotalAmount
 
-# \- Ticket → BookingItems (1:N)
+### BookingItems
 
-# 
+Represents the ticket types and quantities included in a booking.
 
-# \### ERD
+* Id
+* BookingId
+* TicketTypeId
+* Quantity
+* UnitPrice
 
-# 
+---
 
-# !\[EventHub ERD](./ERD.png)
+## Entity Relationships
 
-# 
+The database relationships are:
 
-# \### Sprint 1 Backlog
+* One Category can contain many Events.
+* Each Event belongs to one Category.
+* One Event can have many TicketTypes.
+* Each TicketType belongs to one Event.
+* One User can have many Bookings.
+* Each Booking belongs to one User.
+* One Booking can contain many BookingItems.
+* Each BookingItem belongs to one Booking.
+* One TicketType can be referenced by many BookingItems.
 
-# 
+### Relationship Summary
 
-# \- \[ ] Create project structure
+```text
+Category 1 ──── * Event
+Event 1 ─────── * TicketType
+User 1 ──────── * Booking
+Booking 1 ───── * BookingItem
+TicketType 1 ── * BookingItem
+```
 
-# \- \[ ] Implement database entities
+---
 
-# \- \[ ] Configure EF Core and relationships
+## ERD
 
-# \- \[ ] Configure Fluent API
+The following ERD represents the database design that will be used as the reference for the implementation of the project.
 
-# \- \[ ] Create and apply migrations
+![EventHub ERD](./eventhub-erd.png)
 
-# \- \[ ] Implement event read endpoints
+The ERD will be kept synchronized with the actual EF Core data model as the project evolves.
 
-# \- \[ ] Implement ticket endpoints
+---
 
-# \- \[ ] Implement booking creation
+## Sprint 1 Backlog
 
-# \- \[ ] Add validation
+| Task                                            | Estimated Effort |
+| ----------------------------------------------- | ---------------: |
+| Finalize EventHub ERD                           |          2 hours |
+| Create EF Core entity models                    |          2 hours |
+| Configure relationships using Fluent API        |          2 hours |
+| Create initial database migration               |           1 hour |
+| Apply migration and verify database             |           1 hour |
+| Implement GET all events endpoint               |          2 hours |
+| Implement GET event by ID endpoint              |           1 hour |
+| Implement event filtering and pagination        |          3 hours |
+| Implement ticket type operations                |          3 hours |
+| Implement booking creation                      |          3 hours |
+| Implement booking validation and business rules |          3 hours |
+| Test core endpoints with Postman                |          2 hours |
 
-# \- \[ ] Test core endpoints
+---
 
+## Sprint 1 Scope
+
+The first sprint will focus on:
+
+1. Database schema and EF Core configuration.
+2. Code-first migrations.
+3. Event catalog read operations.
+4. Ticket type management.
+5. Initial booking flow.
+6. Basic business rules related to ticket availability.
+7. API testing using Postman.
+
+---
+
+## Definition of Done
+
+Sprint 1 will be considered complete when:
+
+* [ ] The complete database schema is documented.
+* [ ] The ERD is finalized and stored in the repository.
+* [ ] EF Core models match the ERD.
+* [ ] Relationships are configured using Fluent API.
+* [ ] The initial migration is created successfully.
+* [ ] The database is created successfully.
+* [ ] Core event endpoints are implemented.
+* [ ] Ticket type operations are implemented.
+* [ ] The initial booking flow is implemented.
+* [ ] Core endpoints are tested using Postman.
+* [ ] Code is committed to GitHub.
+* [ ] A pull request is prepared for mentor review.
+* [ ] Unfinished tasks are moved to the next sprint backlog.
+
+---
+
+## Day 1 Deliverables
+
+At the end of Day 1, the following were completed:
+
+* Sprint 1 goal defined.
+* EventHub database entities identified.
+* Complete database relationships designed.
+* ERD created and documented.
+* Sprint 1 backlog defined with estimated tasks.
+* Initial Definition of Done established.
+
+---
+
+## Technologies
+
+* C#
+* ASP.NET Core
+* Entity Framework Core
+* SQL Server
+* Git & GitHub
+* dbdiagram.io
+
+---
+
+## Project Structure
+
+The project will be developed incrementally throughout Phase 3.
+
+```text
+EventHub/
+│
+├── Week 06/
+│   └── Day 01/
+│       ├── README.md
+│       └── eventhub-erd.png
+│
+└── EventHub/
+    └── ASP.NET Core API
+```
+
+---
+
+## Next Step — Day 2
+
+Day 2 will implement the database design in Entity Framework Core by creating the entity models, configuring their relationships using the Fluent API, and generating the initial code-first migration.
