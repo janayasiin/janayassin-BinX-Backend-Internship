@@ -4,6 +4,7 @@ using EventHub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventHub.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824233551_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,26 +108,6 @@ namespace EventHub.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Music and live performance events",
-                            Name = "Music"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Technology conferences and events",
-                            Name = "Technology"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Sports events and competitions",
-                            Name = "Sports"
-                        });
                 });
 
             modelBuilder.Entity("EventHub.Models.Event", b =>
@@ -169,68 +152,6 @@ namespace EventHub.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Capacity = 200,
-                            CategoryId = 2,
-                            CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "A conference about modern technology and software development.",
-                            EndDate = new DateTime(2026, 9, 10, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Nablus",
-                            StartDate = new DateTime(2026, 9, 10, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Tech Conference 2026"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Capacity = 150,
-                            CategoryId = 1,
-                            CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "An evening featuring live music performances.",
-                            EndDate = new DateTime(2026, 9, 15, 22, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Ramallah",
-                            StartDate = new DateTime(2026, 9, 15, 18, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Live Music Night"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Capacity = 500,
-                            CategoryId = 3,
-                            CreatedAt = new DateTime(2026, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "A local football championship event.",
-                            EndDate = new DateTime(2026, 9, 20, 20, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Nablus",
-                            StartDate = new DateTime(2026, 9, 20, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Football Championship"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Capacity = 100,
-                            CategoryId = 2,
-                            CreatedAt = new DateTime(2026, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "A meetup for developers to discuss backend and web development.",
-                            EndDate = new DateTime(2026, 10, 5, 15, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Nablus",
-                            StartDate = new DateTime(2026, 10, 5, 11, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Developer Meetup"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Capacity = 1000,
-                            CategoryId = 1,
-                            CreatedAt = new DateTime(2026, 8, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "A large outdoor music festival.",
-                            EndDate = new DateTime(2026, 10, 12, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Ramallah",
-                            StartDate = new DateTime(2026, 10, 12, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Summer Music Festival"
-                        });
                 });
 
             modelBuilder.Entity("EventHub.Models.TicketType", b =>
