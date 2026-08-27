@@ -109,14 +109,4 @@ The Sprint 1 documentation includes:
 
 ---
 
-## ⚠️ What Could Be Improved
 
-* Automated tests should be written earlier instead of relying mainly on manual Swagger testing.
-* More unit and integration tests are needed for business logic and transaction behavior.
-* Pull Request reviews and mentor feedback should be incorporated earlier during the sprint.
-
----
-
-## 🚀 Action for Sprint 2
-
-> **Write automated tests for new business logic and error cases before considering each feature complete.**
