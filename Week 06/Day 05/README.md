@@ -1,134 +1,122 @@
-# \## Sprint 1 Review
+# Sprint 1 Review
 
-# 
+## 🎯 Sprint Goal
 
-# \### Sprint Goal
+Implement and validate the core backend functionality of the **Cardiac Patient Monitoring System**, including:
 
-# 
+* Authentication & Authorization
+* Patient Management
+* Vital Signs Management
+* Medication Management
+* Appointment Management
+* Appointment Notes
 
-# Implement and validate the core backend functionality of the Cardiac Patient Monitoring System, including authentication, patient management, vital signs, medications, appointments, and appointment notes.
+---
 
-# 
+## ✅ Completed Work
 
-# \### Completed Work
+### 🔐 Authentication & Authorization
 
-# 
+* Implemented **JWT Authentication and Authorization**.
+* Configured role-based access where required.
 
-# \* Implemented JWT authentication and authorization.
+### 👤 Patient Management
 
-# \* Implemented patient profile management.
+* Implemented patient profile management.
+* Added API endpoints for managing patient information.
 
-# \* Implemented Vital Signs management.
+### ❤️ Vital Signs
 
-# \* Implemented Medication CRUD operations and patient filtering.
+* Implemented **Vital Signs management**.
+* Added endpoints for creating, retrieving, updating, and managing patient vital signs.
 
-# \* Implemented Appointment CRUD operations.
+### 💊 Medications
 
-# \* Added appointment business rules:
+* Implemented **Medication CRUD operations**.
+* Added patient-based medication filtering.
 
-# 
+### 📅 Appointments
 
-# &#x20; \* Appointments must be scheduled in the future.
+* Implemented **Appointment CRUD operations**.
+* Added appointment business rules:
 
-# &#x20; \* Duplicate appointments at the same date and time are prevented.
+  * Appointments must be scheduled in the future.
+  * Duplicate appointments at the same date and time are prevented.
 
-# \* Added `AppointmentNote` related to an appointment.
+### 📝 Appointment Notes
 
-# \* Implemented a database transaction for creating an appointment and its related note.
+* Added the `AppointmentNote` entity and its relationship with appointments.
+* Implemented appointment creation with its related note as a **single database transaction**.
+* Tested transaction rollback by intentionally exceeding the database note length limit.
+* Verified that when the note operation failed, **both the appointment and note were rolled back successfully**.
 
-# \* Tested transaction rollback by intentionally exceeding the database note length limit and verifying that both the appointment and note were rolled back.
+### 🗄️ Database & EF Core
 
-# \* Configured entity relationships using EF Core Fluent API.
+* Configured entity relationships using **EF Core Fluent API**.
+* Added seed data for medical conditions.
+* Created and maintained EF Core migrations.
 
-# \* Added seed data for medical conditions.
+### 🧪 API Validation
 
-# \* Tested the implemented API endpoints through Swagger and verified successful and error responses.
+* Tested the implemented API endpoints using **Swagger**.
+* Verified both successful responses and expected error responses.
 
-# 
+---
 
-# \### Sprint Review Outcome
+## 📊 Sprint Review Outcome
 
-# 
+The core **Sprint 1 functionality was successfully implemented and manually validated through Swagger**.
 
-# The core Sprint 1 functionality was implemented and manually validated through Swagger.
+The following incomplete items were moved to the **Sprint 2 backlog**:
 
-# 
+* Expand automated unit and integration test coverage.
+* Complete the Pull Request review and merge process.
+* Address mentor feedback and remaining code-review issues.
+* Continue improving API validation and error handling where required.
 
-# Incomplete items were moved to the Sprint 2 backlog:
+---
 
-# 
+# 📚 Sprint 1 Documentation
 
-# \* Expand automated unit and integration test coverage.
+The Sprint 1 documentation includes:
 
-# \* Complete the pull request review and merge process.
+* 📌 ERD of the implemented database schema.
+* 📌 EF Core migration history.
+* 📌 Implemented API features.
+* 📌 Transaction and rollback validation.
+* 📌 Sprint retrospective.
+* 📌 Sprint 2 action items.
 
-# \* Address mentor feedback and any remaining code-review issues.
+---
 
-# \* Continue improving API validation and error handling where required.
+# 🔄 Sprint 1 Retrospective
 
-# 
+## ✅ What Went Well
 
-# \### Sprint 1 Documentation
+* The core backend features were implemented successfully.
+* EF Core relationships were configured using **Fluent API**.
+* Business logic was implemented beyond basic CRUD operations.
+* Appointment creation was implemented as a **multi-step database operation**.
+* Transaction rollback was successfully tested by intentionally causing the appointment note operation to fail.
+* API endpoints were manually tested through **Swagger** with both successful and error scenarios.
+* The project structure remained organized using:
 
-# 
+  * Controllers
+  * Services
+  * DTOs
+  * Models
+  * Data
 
-# The Sprint 1 documentation includes:
+---
 
-# 
+## ⚠️ What Could Be Improved
 
-# \* ERD of the implemented database schema.
+* Automated tests should be written earlier instead of relying mainly on manual Swagger testing.
+* More unit and integration tests are needed for business logic and transaction behavior.
+* Pull Request reviews and mentor feedback should be incorporated earlier during the sprint.
 
-# \* EF Core migration history.
+---
 
-# \* Implemented API features.
+## 🚀 Action for Sprint 2
 
-# \* Transaction and rollback validation.
-
-# \* Sprint retrospective and Sprint 2 action item.
-
-# 
-
-\## Sprint 1 Retrospective
-
-
-
-\### What Went Well
-
-
-
-\* The core backend features were implemented successfully.
-
-\* EF Core relationships were configured using Fluent API.
-
-\* Business logic was added beyond simple CRUD operations.
-
-\* Appointment creation was implemented as a multi-step database operation.
-
-\* Transaction rollback was tested successfully by forcing the appointment note operation to fail.
-
-\* API endpoints were manually tested through Swagger with successful and error cases.
-
-\* The project structure remained organized using Controllers, Services, DTOs, Models, and Data layers.
-
-
-
-\### What Could Be Improved
-
-
-
-\* Automated tests should be written earlier instead of relying mainly on manual Swagger testing.
-
-\* More unit and integration tests are needed for business logic and transaction behavior.
-
-\* Pull request review and feedback should be incorporated earlier in the sprint.
-
-
-
-\### Action for Sprint 2
-
-
-
-\*\*Write automated tests for new business logic and error cases before considering each feature complete.\*\*
-
-
-
+> **Write automated tests for new business logic and error cases before considering each feature complete.**
