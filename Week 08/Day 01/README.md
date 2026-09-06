@@ -24,7 +24,7 @@ EF Core SQL logging was enabled in the development environment to inspect the SQ
 
 Sensitive data logging was enabled only in Development for debugging purposes.
 
-![EF Core Query Logging](./screenshots/ef-core-query-logging.png)
+![EF Core Query Logging](./images/ef-core-query-logging.png)
 
 ---
 
@@ -40,7 +40,7 @@ The endpoint generated a single SQL query containing the required join and filte
 
 **Result:** No N+1 problem detected.
 
-![Vital Signs Query](./screenshots/vital-signs-query.png)
+![Vital Signs Query](./images/vital-signs-query.png)
 
 ---
 
@@ -52,7 +52,7 @@ The endpoint generated a single SQL query including the appointment note relatio
 
 **Result:** No N+1 problem detected.
 
-![Appointments Query](./screenshots/appointments-query.png)
+![Appointments Query](./images/appointments-query.png)
 
 ---
 
@@ -74,7 +74,7 @@ This resulted in:
 
 **1 + 58 = 59 database queries**
 
-![N+1 Queries](./screenshots/n-plus-one-queries.png)
+![N+1 Queries](./images/n-plus-one-queries.png)
 
 ---
 
