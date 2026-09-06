@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../CardiacPatientMonitoringSystem.Day1.Tests/CardiacPatientMonitoringSystem.Day1.Tests.csproj" Id="1df7ae0a-6ee5-463e-bab6-77340b9f40b1" />
+  <Project Path="CardiacPatientMonitoringSystem.csproj" />
+</Solution>
