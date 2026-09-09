@@ -1,174 +1,98 @@
-# Day 4 — Database Indexing & Performance Profiling
+# Week 08 — Day 04
 
-## Overview
+## Database Indexing & Performance Profiling
 
-Day 4 focused on **database indexing and query performance profiling**.
+### Overview
 
-The main objectives were to identify columns and column combinations that genuinely benefit from indexing, add appropriate indexes using **EF Core Fluent API**, apply the required migrations, and analyze query performance before and after indexing using **SQL Server execution plans and timing measurements**.
+Day 04 focused on improving database query performance by identifying suitable index candidates, adding indexes using EF Core Fluent API, creating migrations, and profiling queries using SQL Server execution plans.
 
-The indexes were selected based on actual query patterns rather than indexing every column indiscriminately.
+The goal was not only to add indexes, but also to verify whether SQL Server actually uses them and document the observed behavior.
 
 ---
 
 ## 1. Identifying Index Candidates
 
-Based on the application's query patterns, the following candidates were identified as frequently filtered, joined, or looked-up fields:
+Before adding indexes, frequently filtered, joined, and sorted columns were reviewed.
 
-* `Patients.UserId`
-* `Appointments (PatientId, AppointmentDate)`
-* `VitalSigns (PatientId, RecordedAt)`
+Three suitable candidates were identified:
 
-### 1.1 Patients — UserId
+### Patient — `UserId`
 
-`Patient.UserId` is used to associate a patient with the corresponding Identity user and is a frequent lookup field.
+`UserId` is frequently used when retrieving a patient based on the authenticated Identity user.
 
-![Patients UserId Index Candidate](images/index-candidate-patient-userid.png)
+![Patient UserId Index Candidate](images/index-candidate-patient-userid.png)
 
-The index is configured using EF Core Fluent API:
+### Appointments — `PatientId + AppointmentDate`
 
-```csharp
-modelBuilder.Entity<Patient>()
-    .HasIndex(p => p.UserId);
-```
+Appointments are commonly queried using both the patient and appointment date. Therefore, a composite index was considered appropriate.
 
-The `Patients.UserId` index was already present in the initial database migration as a unique index, so no additional migration was required for it.
+![Appointment Composite Index Candidate](images/index-candidate-appointments-patient-date.png)
+
+### VitalSigns — `PatientId + RecordedAt`
+
+Vital signs are frequently retrieved for a specific patient and ordered or filtered by their recording time.
+
+![VitalSign Composite Index Candidate](images/index-candidate-vitals-patient-recordedat.png)
 
 ---
 
-### 1.2 Appointments — PatientId + AppointmentDate
+## 2. Index Configuration
 
-Appointment queries may filter by both the patient and the appointment date. Therefore, these two columns were selected as a **composite index** candidate.
-
-![Appointments Composite Index Candidate](images/index-candidate-appointments-patient-date.png)
-
-The composite index was configured as:
+The indexes were configured using EF Core Fluent API inside `AppDbContext`.
 
 ```csharp
+// Index for frequent UserId lookups
+modelBuilder.Entity<Patient>()
+    .HasIndex(p => p.UserId);
+
+// Composite index for appointment queries
 modelBuilder.Entity<Appointment>()
     .HasIndex(a => new { a.PatientId, a.AppointmentDate });
+
+// Composite index for vital sign queries
+modelBuilder.Entity<VitalSign>()
+    .HasIndex(v => new { v.PatientId, v.RecordedAt });
 ```
 
-This creates the following index:
+The composite indexes were selected because the corresponding queries commonly use the two columns together.
+
+---
+
+## 3. EF Core Migrations
+
+### Appointment Composite Index
+
+A migration was created to replace the existing single-column `PatientId` index with the composite index:
 
 ```text
 IX_Appointments_PatientId_AppointmentDate
 ```
 
-Using a composite index allows the database to optimize queries that use this column combination together.
+![Appointment Composite Index Migration](images/appointment-composite-index-migration.png)
 
----
+### VitalSigns Composite Index
 
-### 1.3 VitalSigns — PatientId + RecordedAt
-
-Vital signs are associated with a patient and are time-based. Queries may need to retrieve vital signs for a specific patient according to their recording time.
-
-Therefore, `(PatientId, RecordedAt)` was selected as another composite index candidate.
-
-![VitalSigns Composite Index Candidate](images/index-candidate-vitals-patient-recordedat.png)
-
-The index was configured as:
-
-```csharp
-modelBuilder.Entity<VitalSign>()
-    .HasIndex(v => new { v.PatientId, v.RecordedAt });
-```
-
-This creates:
+A migration was also created for:
 
 ```text
 IX_VitalSigns_PatientId_RecordedAt
 ```
 
----
-
-# 2. Adding Indexes with EF Core Migrations
-
-After configuring the indexes in `ApplicationDbContext`, EF Core migrations were used to apply the database schema changes.
-
-## 2.1 Appointments Migration
-
-The existing single-column `PatientId` index was replaced with the composite index:
-
-```csharp
-migrationBuilder.DropIndex(
-    name: "IX_Appointments_PatientId",
-    table: "Appointments");
-
-migrationBuilder.CreateIndex(
-    name: "IX_Appointments_PatientId_AppointmentDate",
-    table: "Appointments",
-    columns: new[] { "PatientId", "AppointmentDate" });
-```
-
-![Appointments Composite Index Migration](images/appointment-composite-index-migration.png)
-
-The resulting index covers:
-
-```text
-PatientId + AppointmentDate
-```
-
-which matches the query pattern being evaluated.
-
----
-
-## 2.2 VitalSigns Migration
-
-The existing single-column `PatientId` index was replaced with the composite index:
-
-```csharp
-migrationBuilder.DropIndex(
-    name: "IX_VitalSigns_PatientId",
-    table: "VitalSigns");
-
-migrationBuilder.CreateIndex(
-    name: "IX_VitalSigns_PatientId_RecordedAt",
-    table: "VitalSigns",
-    columns: new[] { "PatientId", "RecordedAt" });
-```
-
 ![VitalSigns Composite Index Migration](images/vitals-composite-index-migration.png)
 
-The resulting index covers:
+### Patient `UserId`
 
-```text
-PatientId + RecordedAt
-```
+The `Patient.UserId` index already existed in the initial migration as a unique index.
 
----
-
-## 2.3 Patients UserId Index
-
-The `Patients.UserId` index was already created in the initial migration:
-
-```csharp
-migrationBuilder.CreateIndex(
-    name: "IX_Patients_UserId",
-    table: "Patients",
-    column: "UserId",
-    unique: true);
-```
-
-Therefore, when an additional migration was generated for this index, EF Core produced an empty migration because the index was already present in the model snapshot and initial migration.
-
-No duplicate migration was needed.
+Therefore, creating another migration for it produced an empty migration because the EF Core model and snapshot were already synchronized.
 
 ---
 
-# 3. Profiling Query Performance
+# 4. Performance Profiling
 
-Query performance was evaluated using two types of evidence:
+Performance was checked before and after the indexing changes.
 
-1. **Timing measurements** recorded before indexing.
-2. **SQL Server execution plans** inspected after indexing.
-
-Execution plans provide concrete evidence of how SQL Server executes a query, such as whether it performs an `Index Seek` or a `Clustered Index Scan`.
-
----
-
-# 4. Baseline Performance — Before Indexing
-
-The following baseline measurements were recorded before applying the new composite indexes:
+The baseline measurements were:
 
 | Query                                        | SQL Time | Request Time |
 | -------------------------------------------- | -------: | -----------: |
@@ -176,61 +100,63 @@ The following baseline measurements were recorded before applying the new compos
 | `VitalSigns (PatientId + RecordedAt)`        |     9 ms |        72 ms |
 | `Appointments (PatientId + AppointmentDate)` |    10 ms |        91 ms |
 
-These measurements were used as the baseline for the subsequent analysis.
+Because the test database contains a small amount of data, execution-plan timing is very small and may appear as `0.000s`. Therefore, the execution plans were used primarily to verify whether SQL Server selected the created indexes rather than claiming an artificial percentage improvement.
 
 ---
 
-# 5. VitalSigns — After Indexing
+# 5. VitalSigns — Before Index
 
-After applying the `VitalSigns` composite index, the query execution plan was inspected.
+Before adding the composite index, the VitalSigns query was profiled using the baseline execution.
 
-The plan showed:
+![VitalSigns Before Index](images/baseline-vital-signs-before-index.png)
 
-**`Index Seek (NonClustered)`**
+The baseline SQL execution time was approximately **9 ms**, with an overall request time of approximately **72 ms**.
 
-on the `VitalSigns` table using the newly created composite index.
+---
 
-![VitalSigns Execution Plan After Index](images/baseline-vital-signs-after-index.png)
+# 6. VitalSigns — After Index
 
-The execution plan also contained:
+After adding the composite index:
+
+```text
+IX_VitalSigns_PatientId_RecordedAt
+```
+
+the query execution plan was inspected.
+
+![VitalSigns After Index](images/baseline-vital-signs-after-index.png)
+
+The execution plan shows:
 
 * `Index Seek (NonClustered)` on `Patients`
 * `Index Seek (NonClustered)` on `VitalSigns`
 * `Key Lookup (Clustered)` on `VitalSigns`
 
-The important part of the plan is:
+Most importantly, SQL Server used the composite VitalSigns index through an **Index Seek**, confirming that the index was useful for the tested query.
 
-```text
-Index Seek (NonClustered)
-        ↓
-IX_VitalSigns_PatientId_RecordedAt
-```
-
-This confirms that SQL Server selected the new composite index for the tested query.
-
-### Performance Result
-
-Before indexing:
-
-```text
-9 ms SQL / 72 ms request
-```
-
-After indexing, the execution plan displayed approximately:
-
-```text
-0.000s
-```
-
-Because the current dataset is relatively small and the execution time is extremely short, there is not enough evidence to claim a reliable percentage-based runtime improvement.
-
-Instead, the execution plan provides clear evidence that the composite index is being used through an `Index Seek`.
+The displayed execution-plan time was `0.000s`, which is too coarse to claim a reliable numerical improvement for this small dataset.
 
 ---
 
-# 6. Appointments — After Indexing
+# 7. Appointments — Before Index
 
-The following query was used to evaluate the `Appointments` composite index:
+Before adding the composite index, the appointment query was measured using the baseline configuration.
+
+![Appointments Before Index](images/baseline-appointments-before-index.png)
+
+The baseline SQL execution time was approximately **10 ms**, with an overall request time of approximately **91 ms**.
+
+---
+
+# 8. Appointments — After Index
+
+After creating:
+
+```text
+IX_Appointments_PatientId_AppointmentDate
+```
+
+the following query was tested:
 
 ```sql
 SELECT *
@@ -239,149 +165,100 @@ WHERE [PatientId] = @1
   AND [AppointmentDate] = @2;
 ```
 
-After applying the composite index, the execution plan was inspected.
+![Appointments After Index](images/appointments-execution-plan-after-index.png)
 
-![Appointments Execution Plan After Index](images/appointments-execution-plan-after-index.png)
-
-The plan showed:
-
-**`Clustered Index Scan`**
-
-on the `Appointments` table.
-
-This means that SQL Server did **not** select the newly created composite index for this particular query.
-
-### Why did SQL Server use a Clustered Index Scan?
-
-This does not necessarily mean that the index is incorrect.
-
-SQL Server uses a **cost-based query optimizer**. It compares different execution strategies and chooses the one it estimates to be cheaper.
-
-With a small `Appointments` table, scanning the clustered index can be cheaper than using a non-clustered index and performing additional lookups.
-
-Therefore, the optimizer selected:
+The execution plan showed:
 
 ```text
 Clustered Index Scan
 ```
 
-instead of:
+on:
 
 ```text
-Index Seek
-    ↓
-IX_Appointments_PatientId_AppointmentDate
+PK_Appointments
 ```
 
-### Performance Result
+rather than using the newly created composite index.
 
-Before indexing:
+This does not mean that the index was incorrectly created. SQL Server's optimizer chooses the execution plan it estimates to be cheapest. With the current small dataset, scanning the clustered table can be cheaper than using a nonclustered index followed by additional lookups.
 
-```text
-10 ms SQL / 91 ms request
-```
-
-After indexing, the execution plan displayed approximately:
-
-```text
-0.000s
-```
-
-Since the current dataset is small, the available measurements do not support claiming a numerical performance improvement.
-
-The documented result is therefore:
-
-> The composite index was created successfully, but SQL Server did not select it for the tested query under the current data size and execution conditions.
+Therefore, **no performance improvement is claimed for the tested Appointments query**.
 
 ---
 
-# 7. Patients — UserId
+# 9. Patient `UserId` Index
 
-The `Patients.UserId` index was already present in the initial migration and was therefore not treated as a newly added index.
+The `Patient.UserId` column already had a unique index created by the initial migration.
 
-The baseline lookup measurement was:
+![Patient UserId Baseline](images/baseline-patient-userid-before-index.png)
 
-```text
-7 ms SQL / 43 ms request
-```
+The baseline measurement for the query was approximately:
 
-The index was identified as an appropriate candidate because `UserId` is used for frequent patient lookups.
+* SQL Time: **7 ms**
+* Request Time: **43 ms**
 
-![Patients UserId Index Candidate](images/index-candidate-patient-userid.png)
-
-No additional migration was created because the index already existed in the database schema.
+Since the index already existed in the initial database schema, no additional migration was required for this index.
 
 ---
 
-# 8. Before vs After Summary
+# 10. Before vs After Summary
 
-| Index Candidate                             | Before                    | After                       | Result                            |
-| ------------------------------------------- | ------------------------- | --------------------------- | --------------------------------- |
-| `Patients.UserId`                           | 7 ms SQL / 43 ms request  | Existing index              | ✅ Index already present           |
-| `VitalSigns (PatientId, RecordedAt)`        | 9 ms SQL / 72 ms request  | `Index Seek (NonClustered)` | ✅ Composite index used            |
-| `Appointments (PatientId, AppointmentDate)` | 10 ms SQL / 91 ms request | `Clustered Index Scan`      | ⚠️ Index created but not selected |
+| Query                                        | Before                    | After / Execution Plan | Result                |
+| -------------------------------------------- | ------------------------- | ---------------------- | --------------------- |
+| `Patients.UserId`                            | 7 ms SQL / 43 ms request  | Existing unique index  | Index already present |
+| `VitalSigns (PatientId + RecordedAt)`        | 9 ms SQL / 72 ms request  | Composite Index Seek   | Index used            |
+| `Appointments (PatientId + AppointmentDate)` | 10 ms SQL / 91 ms request | Clustered Index Scan   | Index not selected    |
 
-> **Note:** The execution plans displayed approximately `0.000s` for the tested queries. Because of the small dataset and extremely short execution times, numerical percentage improvements were not considered reliable. Execution-plan behavior was therefore used as the main evidence of index utilization.
+Because the dataset is small and the execution-plan timings are displayed as `0.000s`, exact numerical performance improvements cannot be reliably calculated.
+
+The important result is the actual optimizer behavior observed in the execution plans.
 
 ---
 
-# 9. Key Findings
+# 11. Key Findings
 
-### Indexes should target real query patterns
+### VitalSigns
 
-Indexes should be added to columns that are frequently used in:
-
-* `WHERE` clauses
-* `JOIN` conditions
-* `ORDER BY`
-* Common lookup operations
-
-Adding indexes to every column is not recommended because indexes also introduce storage and write-maintenance overhead.
-
-### Composite indexes are useful for multi-column query patterns
-
-The following composite indexes were added based on actual query patterns:
+The composite index:
 
 ```text
-(PatientId, AppointmentDate)
 (PatientId, RecordedAt)
 ```
 
-The column order was selected according to the filtering patterns of the tested queries.
+was successfully created and selected by SQL Server through an **Index Seek**.
 
-### Index creation does not guarantee index usage
+This confirms that the index matches the access pattern of the tested VitalSigns query.
 
-The `Appointments` index was successfully created, but SQL Server chose a clustered scan for the tested query.
+### Appointments
 
-This demonstrates that index usage depends on the query optimizer and the estimated cost of each execution strategy.
-
-### Execution plans provide concrete evidence
-
-The `VitalSigns` execution plan showed a non-clustered `Index Seek` using:
+The composite index:
 
 ```text
-IX_VitalSigns_PatientId_RecordedAt
+(PatientId, AppointmentDate)
 ```
 
-This provides concrete evidence that SQL Server is using the composite index.
+was successfully created, but SQL Server chose a **Clustered Index Scan** for the tested query.
+
+This demonstrates that creating an index does not guarantee that SQL Server will use it. The optimizer considers factors such as table size, selectivity, and estimated query cost.
+
+### Patients
+
+The `UserId` index was already present from the initial database migration, so no additional migration was necessary.
 
 ---
 
-# 10. Conclusion
+# 12. Conclusion
 
-Day 4 successfully covered the database indexing and performance profiling requirements.
+Day 04 demonstrated the complete indexing and performance-profiling workflow:
 
-The work included:
+1. Identify frequently queried columns.
+2. Select appropriate single-column or composite indexes.
+3. Configure indexes using EF Core Fluent API.
+4. Create and apply EF Core migrations.
+5. Measure baseline query performance.
+6. Inspect execution plans after indexing.
+7. Verify whether SQL Server actually uses the indexes.
+8. Document the observed performance behavior without making unsupported claims.
 
-* Identifying 2–3 relevant index candidates.
-* Evaluating when indexes are appropriate.
-* Adding composite indexes for multi-column query patterns.
-* Configuring indexes using EF Core Fluent API.
-* Applying the changes through EF Core migrations.
-* Measuring baseline query performance.
-* Inspecting SQL Server execution plans after indexing.
-* Confirming composite index usage for `VitalSigns`.
-* Analyzing the optimizer's decision for `Appointments`.
-* Documenting the results based on actual evidence.
-
-The main takeaway is that **database optimization should be evidence-based**. Creating an index is not enough; its effectiveness should be evaluated using query timings and execution plans to determine how the database engine actually executes the query.
+The profiling results showed that the VitalSigns composite index was actively used through an Index Seek, while the Appointments composite index was not selected for the tested query because the optimizer determined that a clustered scan was cheaper for the current dataset.
