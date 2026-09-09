@@ -122,9 +122,13 @@ After adding the composite index:
 IX_VitalSigns_PatientId_RecordedAt
 ```
 
-the query execution plan was inspected.
+the query was profiled again and its execution plan was inspected.
 
 ![VitalSigns After Index](images/baseline-vital-signs-after-index.png)
+
+The SQL Server execution plan was also captured:
+
+![VitalSigns Execution Plan After Index](images/vitals-execution-plan-after-index.png)
 
 The execution plan shows:
 
